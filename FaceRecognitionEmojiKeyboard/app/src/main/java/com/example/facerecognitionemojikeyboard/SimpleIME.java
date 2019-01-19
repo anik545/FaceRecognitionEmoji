@@ -237,10 +237,9 @@ public class SimpleIME extends InputMethodService
             }
 
             // Let's assume that a successful result includes a message.
-            String message = resultData.getString(KEY_MESSAGE);
-            System.out.println(message);
-            BitmapFactory.Options options = new BitmapFactory.Options();
-            Bitmap bitmap = BitmapFactory.decodeFile(message, options);
+
+            Bitmap bitmap = (Bitmap) resultData.getParcelable(KEY_MESSAGE);
+
 
             InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
             imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, InputMethodManager.HIDE_IMPLICIT_ONLY);
@@ -252,6 +251,8 @@ public class SimpleIME extends InputMethodService
                 Log.d("SIMPLEIME", "Starting then apply");
                 if (faces == null || faces.length == 0) {
                     Log.d("SIMPLEIME", "Stopping due to no face");
+                    showToast("No face detected");
+                    System.out.println("no face");
                 } else {
                     updateEmojis(faces);
                 }
