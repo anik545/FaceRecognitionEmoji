@@ -74,6 +74,7 @@ public class AzureAPI {
                                     FaceServiceClient.FaceAttributeType.Gender }
                                 */
                             );
+                            Log.d("AZUREAPI", "Finished call");
                             return result;
                         } catch (Exception e) {
                             exceptionMessage = e.getMessage();

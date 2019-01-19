@@ -237,16 +237,20 @@ public class SimpleIME extends InputMethodService
             System.out.println(message);
             BitmapFactory.Options options = new BitmapFactory.Options();
             Bitmap bitmap = BitmapFactory.decodeFile(message, options);
-            Log.d("SIMPLEIME", "Starting azure api");
 
             InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
             imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, InputMethodManager.HIDE_IMPLICIT_ONLY);
 
+            Log.d("SIMPLEIME", "Starting azure api");
             AzureAPI a = new AzureAPI();
             CompletableFuture<Face[]> future = a.sendBitmap(bitmap);
             future.thenApply((Face[] faces) -> {
                 Log.d("SIMPLEIME", "Starting then apply");
-                updateEmojis(faces);
+                if (faces == null || faces.length == 0) {
+                    Log.d("SIMPLEIME", "Stopping due to no face");
+                } else {
+                    updateEmojis(faces);
+                }
                 return faces;
             });
         }
