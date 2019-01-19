@@ -21,7 +21,8 @@ public class SimpleIME extends InputMethodService
     @Override
     public void onPress(int primaryCode) {
     }
- 
+
+
     @Override
     public void onRelease(int primaryCode) {            
     }
@@ -61,14 +62,14 @@ public class SimpleIME extends InputMethodService
             kv = (KeyboardView) getLayoutInflater().inflate(R.layout.keyboard, null);
             keyboard = new Keyboard(this, R.xml.qwerty);
         }
-        Log.d("Set view", "After if");
+
         kv.setKeyboard(keyboard);
         kv.setOnKeyboardActionListener(this);
-        Log.d("Set view", "After kv");
+
         if (iSet) {
             setInputView(kv);
         }
-        Log.d("Set view", "After set");
+
         return kv;
     }
 
@@ -79,7 +80,6 @@ public class SimpleIME extends InputMethodService
                 am.playSoundEffect(AudioManager.FX_KEYPRESS_SPACEBAR);
                 break;
             case Keyboard.KEYCODE_DONE:
-            case 10:
                 am.playSoundEffect(AudioManager.FX_KEYPRESS_RETURN);
                 break;
             case Keyboard.KEYCODE_DELETE:
