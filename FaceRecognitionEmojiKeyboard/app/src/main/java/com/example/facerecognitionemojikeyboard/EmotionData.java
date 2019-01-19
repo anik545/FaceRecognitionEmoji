@@ -17,6 +17,28 @@ public class EmotionData {
     public double sadness;
     public double surprise;
 
+    public static Emotion stringToEnum(String s) {
+        switch (s) {
+            case "anger":
+                return Emotion.ANGER;
+            case "contempt":
+                return Emotion.CONTEMPT;
+            case "disgust":
+                return Emotion.DISGUST;
+            case "fear":
+                return Emotion.FEAR;
+            case "happiness":
+                return Emotion.HAPPINESS;
+            case "neutral":
+                return Emotion.NEUTRAL;
+            case "sadness":
+                return Emotion.SADNESS;
+            case "surprise":
+                return Emotion.SURPRISE;
+        }
+        return null;
+    }
+
     EmotionData(Face faceData) {
         anger = faceData.faceAttributes.emotion.anger;
         contempt = faceData.faceAttributes.emotion.contempt;

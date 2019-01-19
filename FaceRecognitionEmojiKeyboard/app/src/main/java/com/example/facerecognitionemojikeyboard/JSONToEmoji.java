@@ -2,43 +2,75 @@ package com.example.facerecognitionemojikeyboard;
 
 import com.example.facerecognitionemojikeyboard.Emotion;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 public class JSONToEmoji {
 
-    public static String getEmoji(Map<Emotion, Double> scores) {
-        Emotion maxEmotion = findMaxEmotion(scores);
-        switch(maxEmotion) {
-            case ANGER:
-                return "1F621";
-            case CONTEMPT:
-                return "1F60F";
-            case DISGUST:
-                return "1F92E";
-            case FEAR:
-                return "1F631";
-            case HAPPINESS:
-                return "1F630";
-            case NEUTRAL:
-                return "1F610";
-            case SADNESS:
-                return "1F622";
-            case SURPRISE:
-                return "1F632";
-        }
-        return "";
+    public static void main(String[] args) throws JSONException {
+        JSONToEmoji test = new JSONToEmoji();
+
     }
 
-    private static Emotion findMaxEmotion(Map<Emotion, Double> scores) {
-        Emotion maxEmotion = Emotion.ANGER;
-        double maxScore = scores.get(Emotion.ANGER);
-        for (Emotion emotion : scores.keySet()) {
-            if (scores.get(emotion) > maxScore) {
-                maxScore = scores.get(emotion);
-                maxEmotion = emotion;
+    private Map<Emotion, Set<String>> emoToEmojis;
+
+    public JSONToEmoji() throws JSONException {
+        String rawData = JSONParser.loadJSONFromAsset(SimpleIME.getAppContext(), "emojisByEmotion.JSON");
+        JSONObject data = new JSONObject(rawData);
+        Iterator<String> iter = data.keys();
+        while (iter.hasNext()) {
+            String key = iter.next();
+            Emotion emo = EmotionData.stringToEnum(key);
+            emoToEmojis.put(emo, new HashSet<String>());
+            JSONArray unicodes = data.getJSONArray(key);
+            for (int i = 0; i < unicodes.length(); i++) {
+                emoToEmojis.get(emo).add((String) unicodes.get(i)); // TODO: does this work?
             }
         }
-        return maxEmotion;
+    }
+
+    // make sure n <= size of emoji sets for each emotion
+    public Set<String> getEmojis(Map<Emotion, Double> scores, int n) {
+
+        Set<String> emojis = new HashSet<>();
+        List<Emotion> sigEmos = getSignificantEmotions(scores);
+
+        for (Emotion emo : sigEmos) {
+            if (emojis.size() < n) {
+                addEmojisByEmotion(emojis, emo, Math.min(n - emojis.size(), (int) Math.ceil(scores.get(emo) * (double) n)));
+            } else {
+                break;
+            }
+        }
+
+        return emojis;
+    }
+
+    private void addEmojisByEmotion(Set<String> addTo, Emotion emo, int n) {
+        Set<String> src = emoToEmojis.get(emo);
+        Iterator iter = src.iterator();
+        while (n > 0 && iter.hasNext()) {
+            addTo.add((String) iter.next());
+            n--;
+        }
+    }
+
+    private List<Emotion> getSignificantEmotions(Map<Emotion, Double> scores) {
+        List<Emotion> emotions = new LinkedList<>();
+        for (Emotion emotion : scores.keySet()) {
+            if (scores.get(emotion) > 0.1) {
+                emotions.add(emotion);
+            }
+        }
+        return emotions;
     }
 
 

@@ -5,9 +5,15 @@ import android.inputmethodservice.InputMethodService;
 import android.inputmethodservice.Keyboard;
 import android.inputmethodservice.KeyboardView;
 import android.media.AudioManager;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.inputmethod.InputConnection;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.util.Set;
 
 public class SimpleIME extends InputMethodService
     implements KeyboardView.OnKeyboardActionListener {
@@ -112,5 +118,18 @@ public class SimpleIME extends InputMethodService
     // TODO: TESTING FUNCTION
     private void test() {
         AzureAPI a = new AzureAPI();
+        JSONToEmoji jtoe = null;
+        JSONObject obj = null;
+        try {
+            jtoe = new JSONToEmoji();
+            obj = new JSONObject(JSONParser.loadJSONFromAsset(SimpleIME.getAppContext(), "testData.JSON"));
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        EmotionData emoData = new EmotionData(obj);
+        Set<String> emojis = jtoe.getEmojis(emoData.exportMap(), 3);
+        for (String s : emojis) {
+            Log.d("a",s);
+        }
     }
 }
