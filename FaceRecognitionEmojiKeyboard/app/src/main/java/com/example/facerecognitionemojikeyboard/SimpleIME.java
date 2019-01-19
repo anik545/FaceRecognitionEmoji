@@ -59,6 +59,7 @@ public class SimpleIME extends InputMethodService
     private InputConnection ic;
 
     private void updateEmojis(Face[] faces) {
+        ic = getCurrentInputConnection();
         EmotionData emotionData = new EmotionData(faces[0]);
         Log.d("SIMPLEIME", "Calling jsonToEmoji");
         Set<String> emojis = jsonToEmoji.getEmojis(emotionData.exportMap(), 1);
@@ -66,7 +67,10 @@ public class SimpleIME extends InputMethodService
         String toCommit = emojis.iterator().next();
         Log.d("SIMPLEIME", "Committing");
         Log.d("SIMPLEIME", "Committing: " + toCommit);
-        ic.commitText(String.valueOf(toCommit), 1);
+        int i = Integer.valueOf(toCommit, 16);
+        String s = new String(Character.toChars(i));
+        ic.commitText(s, 1);
+
     }
  
     private boolean numbers = false;
