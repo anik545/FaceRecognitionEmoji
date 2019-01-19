@@ -1,11 +1,14 @@
 package com.example.facerecognitionemojikeyboard;
 
+import android.util.Log;
+
 import com.example.facerecognitionemojikeyboard.Emotion;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -20,7 +23,7 @@ public class JSONToEmoji {
 
     }
 
-    private Map<Emotion, Set<String>> emoToEmojis;
+    private Map<Emotion, Set<String>> emoToEmojis = new HashMap<>();
 
     public JSONToEmoji() throws JSONException {
         String rawData = JSONParser.loadJSONFromAsset(SimpleIME.getAppContext(), "emojisByEmotion.JSON");
@@ -29,10 +32,11 @@ public class JSONToEmoji {
         while (iter.hasNext()) {
             String key = iter.next();
             Emotion emo = EmotionData.stringToEnum(key);
-            emoToEmojis.put(emo, new HashSet<String>());
+            Set<String> emojis = new HashSet<String>();
+            emoToEmojis.put(emo, emojis);
             JSONArray unicodes = data.getJSONArray(key);
             for (int i = 0; i < unicodes.length(); i++) {
-                emoToEmojis.get(emo).add((String) unicodes.get(i)); // TODO: does this work?
+                emojis.add((String) unicodes.get(i)); // TODO: does this work?
             }
         }
     }
