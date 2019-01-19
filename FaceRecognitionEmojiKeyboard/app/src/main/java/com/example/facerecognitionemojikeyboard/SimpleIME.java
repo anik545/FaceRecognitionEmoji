@@ -191,7 +191,7 @@ public class SimpleIME extends InputMethodService
             Bitmap bitmap = BitmapFactory.decodeFile(message, options);
 
             InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-            imm.toggleSoftInput(InputMethodManager.SHOW_IMPLICIT, InputMethodManager.HIDE_IMPLICIT_ONLY);
+            imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, InputMethodManager.HIDE_IMPLICIT_ONLY);
 
             AzureAPI a = new AzureAPI();
             a.sendBitmap(bitmap);
