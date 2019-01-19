@@ -2,6 +2,7 @@ package com.example.facerecognitionemojikeyboard;
 
 import com.microsoft.projectoxford.face.contract.Face;
 
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.HashMap;
@@ -48,6 +49,18 @@ public class EmotionData {
         neutral = faceData.faceAttributes.emotion.neutral;
         sadness = faceData.faceAttributes.emotion.sadness;
         surprise = faceData.faceAttributes.emotion.surprise;
+    }
+
+    EmotionData(JSONObject rawData) throws JSONException {
+        JSONObject scores = (JSONObject) rawData.get("scores");
+        anger = (double) scores.get("anger");
+        contempt = (double) scores.get("contempt");
+        disgust = (double) scores.get("disgust");
+        fear = (double) scores.get("fear");
+        happiness = (double) scores.get("happiness");
+        neutral = (double) scores.get("neutral");
+        sadness = (double) scores.get("sadness");
+        surprise = (double) scores.get("surprise");
     }
 
     HashMap<Emotion, Double> exportMap() {

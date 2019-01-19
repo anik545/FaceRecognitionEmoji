@@ -120,13 +120,14 @@ public class SimpleIME extends InputMethodService
         AzureAPI a = new AzureAPI();
         JSONToEmoji jtoe = null;
         JSONObject obj = null;
+        EmotionData emoData = null;
         try {
             jtoe = new JSONToEmoji();
             obj = new JSONObject(JSONParser.loadJSONFromAsset(SimpleIME.getAppContext(), "testData.JSON"));
+            emoData = new EmotionData(obj);
         } catch (JSONException e) {
             e.printStackTrace();
         }
-        EmotionData emoData = new EmotionData(obj);
         Set<String> emojis = jtoe.getEmojis(emoData.exportMap(), 3);
         for (String s : emojis) {
             Log.d("a",s);
