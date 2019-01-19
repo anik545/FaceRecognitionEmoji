@@ -4,11 +4,13 @@ import android.graphics.Bitmap;
 import android.os.AsyncTask;
 import android.util.Log;
 
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
+import java.util.Set;
 
 import com.microsoft.projectoxford.face.*;
 import com.microsoft.projectoxford.face.contract.*;
@@ -93,6 +95,15 @@ public class AzureAPI {
                         EmotionData faceEmotion = new EmotionData(result[0]);
                         // TODO: Call function on face emotion
                         System.out.println(faceEmotion);
+
+                        JSONToEmoji jtoe = null;
+                        try {
+                            jtoe = new JSONToEmoji();
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                        Set<String> s = jtoe.getEmojis(faceEmotion.exportMap(), 1);
+                        System.out.println("s.get(0) = " + s.iterator().next());
                     }
 
                 };

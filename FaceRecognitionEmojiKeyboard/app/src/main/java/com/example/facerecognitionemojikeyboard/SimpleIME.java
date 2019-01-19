@@ -147,9 +147,15 @@ public class SimpleIME extends InputMethodService
                 Intent intent = new Intent(this, MainActivity.class);
                 intent.putExtra(KEY_RECEIVER, new MessageReceiver());
                 startActivity(intent);
-
 //                pictureService.startCapturing(this);
                 break;
+
+//                case 97:
+//                    int unicode = 0x1F603;
+//                    String s = new String(Character.toChars(unicode));
+//                    ic.commitText(s, 1);
+//                break;
+
             default:
                 char code = (char) primaryCode;
                 if (Character.isLetter(code) && caps) {
