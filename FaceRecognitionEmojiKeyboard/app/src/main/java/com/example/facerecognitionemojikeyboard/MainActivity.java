@@ -2,7 +2,6 @@ package com.example.facerecognitionemojikeyboard;
 
 import android.Manifest;
 import android.app.Activity;
-import android.content.Intent;
 import android.hardware.camera2.CameraCharacteristics;
 import android.hardware.camera2.CameraDevice;
 import android.hardware.camera2.CameraMetadata;
@@ -11,7 +10,6 @@ import android.media.Image;
 import android.os.Bundle;
 import android.os.ResultReceiver;
 import android.util.Log;
-import android.view.MotionEvent;
 import android.view.TextureView;
 import android.view.View;
 

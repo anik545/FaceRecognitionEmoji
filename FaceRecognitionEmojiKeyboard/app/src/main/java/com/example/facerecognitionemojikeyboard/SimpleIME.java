@@ -1,5 +1,6 @@
 package com.example.facerecognitionemojikeyboard;
 
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -20,13 +21,13 @@ import android.view.View;
 import android.view.inputmethod.InputConnection;
 import android.widget.Toast;
 
-import java.util.Map;
-import java.util.TreeMap;
+import org.json.JSONException;
+import org.json.JSONObject;
 
-import static android.content.ContentValues.TAG;
+import java.util.Set;
 
 public class SimpleIME extends InputMethodService
-        implements KeyboardView.OnKeyboardActionListener, PictureCapturingListener {
+        implements KeyboardView.OnKeyboardActionListener {
 
     public static final int RESULT_OK = -1;
 
@@ -45,6 +46,9 @@ public class SimpleIME extends InputMethodService
     private boolean caps = false;
     private Handler handler;
 
+
+    private static Context context;
+ 
     @Override
     public void onPress(int primaryCode) {
     }
@@ -78,7 +82,6 @@ public class SimpleIME extends InputMethodService
         // Handler will get associated with the current thread, 
         // which is the main thread.
         handler = new Handler(getMainLooper());
-        pictureService = PictureCapturingServiceImpl.getInstance(this);
 
         super.onCreate();
     }
@@ -89,7 +92,11 @@ public class SimpleIME extends InputMethodService
 
     @Override
     public View onCreateInputView() {
-        kv = (KeyboardView) getLayoutInflater().inflate(R.layout.keyboard, null);
+
+        // Setting context
+        context = getApplicationContext();
+
+        kv = (KeyboardView)getLayoutInflater().inflate(R.layout.keyboard, null);
         keyboard = new Keyboard(this, R.xml.qwerty);
         kv.setKeyboard(keyboard);
         kv.setOnKeyboardActionListener(this);
@@ -119,8 +126,6 @@ public class SimpleIME extends InputMethodService
         }
     }
 
-    private APictureCapturingService pictureService;
-
     @Override
     public void onKey(int primaryCode, int[] keyCodes) {
         Log.d("s", "s");
@@ -139,17 +144,11 @@ public class SimpleIME extends InputMethodService
                 ic.sendKeyEvent(new KeyEvent(KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_ENTER));
                 break;
             case -10:
-                //TODO: when camera is pressed
                 Intent intent = new Intent(this, MainActivity.class);
                 intent.putExtra(KEY_RECEIVER, new MessageReceiver());
                 startActivity(intent);
 
-
-                showToast("avvs");
-                Toast.makeText(getApplicationContext(), "a", Toast.LENGTH_SHORT).show();
-                Log.d(TAG, "onKey: taken-");
-                System.out.println("avvs");
-                pictureService.startCapturing(this);
+//                pictureService.startCapturing(this);
                 break;
             default:
                 char code = (char) primaryCode;
@@ -181,49 +180,28 @@ public class SimpleIME extends InputMethodService
             // Let's assume that a successful result includes a message.
             String message = resultData.getString(KEY_MESSAGE);
             System.out.println(message);
+            BitmapFactory.Options options = new BitmapFactory.Options();
+            Bitmap bitmap = BitmapFactory.decodeFile(message, options);
+
+            AzureAPI a = new AzureAPI();
+            a.sendBitmap(bitmap);
+
+
+
             // Now you can do something with it.
         }
 
     }
 
-    @Override
-    public void onCaptureDone(String pictureUrl, byte[] pictureData) {
-        if (pictureData != null && pictureUrl != null) {
-            runOnUiThread(() -> {
-                //convert byte array 'pictureData' to a bitmap (no need to read the file from the external storage)
-                final Bitmap bitmap = BitmapFactory.decodeByteArray(pictureData, 0, pictureData.length);
-                //scale image to avoid POTENTIAL "Bitmap too large to be uploaded into a texture" when displaying into an ImageView
-                final int nh = (int) (bitmap.getHeight() * (512.0 / bitmap.getWidth()));
-                final Bitmap scaled = Bitmap.createScaledBitmap(bitmap, 512, nh, true);
-                //do whatever you want with the bitmap or the scaled one...
-            });
-            showToast("Picture saved to " + pictureUrl);
-        }
-
-    }
-
-    @Override
-    public void onDoneCapturingAllPhotos(TreeMap<String, byte[]> picturesTaken) {
-        if (picturesTaken != null && !picturesTaken.isEmpty()) {
-            for (Map.Entry<String, byte[]> entry : picturesTaken.entrySet()) {
-                String pictureUrl = entry.getKey();
-                byte[] pictureData = entry.getValue();
-
-                //convert the byte array 'pictureData' to a bitmap (no need to read the file from the external storage) but in case you
-                //You can also use 'pictureUrl' which stores the picture's location on the device
-                final Bitmap bitmap = BitmapFactory.decodeByteArray(pictureData, 0, pictureData.length);
-            }
-            showToast("Done capturing all photos!");
-            return;
-        }
-        showToast("No camera detected!");
-
-    }
 
     private void showToast(final String text) {
         runOnUiThread(() ->
                 Toast.makeText(getApplicationContext(), text, Toast.LENGTH_SHORT).show()
         );
+    }
+
+    public static Context getAppContext() {
+        return context;
     }
 
 }
