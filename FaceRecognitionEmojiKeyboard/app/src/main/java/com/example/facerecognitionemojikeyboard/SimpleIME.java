@@ -21,10 +21,13 @@ import android.view.View;
 import android.view.inputmethod.InputConnection;
 import android.widget.Toast;
 
+import com.microsoft.projectoxford.face.contract.Face;
+
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.Set;
+import java.util.concurrent.CompletableFuture;
 
 public class SimpleIME extends InputMethodService
         implements KeyboardView.OnKeyboardActionListener {
@@ -43,11 +46,27 @@ public class SimpleIME extends InputMethodService
     protected CameraCaptureSession session;
     protected ImageReader imageReader;
 
+
+    private JSONToEmoji jsonToEmoji;
     private boolean caps = false;
     private Handler handler;
 
 
     private static Context context;
+
+    private Set<String> emojis;
+    private InputConnection ic;
+
+    private void updateEmojis(Face[] faces) {
+        EmotionData emotionData = new EmotionData(faces[0]);
+        Log.d("SIMPLEIME", "Calling jsonToEmoji");
+        Set<String> emojis = jsonToEmoji.getEmojis(emotionData.exportMap(), 1);
+        Log.d("SIMPLEIME", "Finished jsonToEmoji");
+        String toCommit = emojis.iterator().next();
+        Log.d("SIMPLEIME", "Committing");
+        Log.d("SIMPLEIME", "Committing: " + toCommit);
+        ic.commitText(String.valueOf(toCommit), 1);
+    }
  
     @Override
     public void onPress(int primaryCode) {
@@ -95,6 +114,11 @@ public class SimpleIME extends InputMethodService
 
         // Setting context
         context = getApplicationContext();
+        try {
+            jsonToEmoji = new JSONToEmoji();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
         kv = (KeyboardView)getLayoutInflater().inflate(R.layout.keyboard, null);
         keyboard = new Keyboard(this, R.xml.qwerty);
@@ -128,8 +152,7 @@ public class SimpleIME extends InputMethodService
 
     @Override
     public void onKey(int primaryCode, int[] keyCodes) {
-        Log.d("s", "s");
-        InputConnection ic = getCurrentInputConnection();
+        ic = getCurrentInputConnection();
         playClick(primaryCode);
         switch (primaryCode) {
             case Keyboard.KEYCODE_DELETE:
@@ -188,13 +211,14 @@ public class SimpleIME extends InputMethodService
             System.out.println(message);
             BitmapFactory.Options options = new BitmapFactory.Options();
             Bitmap bitmap = BitmapFactory.decodeFile(message, options);
-
+            Log.d("SIMPLEIME", "Starting azure api");
             AzureAPI a = new AzureAPI();
-            a.sendBitmap(bitmap);
-
-
-
-            // Now you can do something with it.
+            CompletableFuture<Face[]> future = a.sendBitmap(bitmap);
+            future.thenApply((Face[] faces) -> {
+                Log.d("SIMPLEIME", "Starting then apply");
+                updateEmojis(faces);
+                return faces;
+            });
         }
 
     }

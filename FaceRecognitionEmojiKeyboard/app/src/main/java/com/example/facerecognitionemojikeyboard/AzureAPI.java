@@ -11,6 +11,13 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.util.Set;
+import java.util.concurrent.Callable;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Executor;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.function.Supplier;
 
 import com.microsoft.projectoxford.face.*;
 import com.microsoft.projectoxford.face.contract.*;
@@ -40,7 +47,7 @@ public class AzureAPI {
 //        Log.d("AZUREAPI", "Api Key: " + apiKey);
     }
 
-    public void sendBitmap(final Bitmap imageBitmap) {
+    public CompletableFuture<Face[]> sendBitmap(final Bitmap imageBitmap) {
 
         // Prepare image for upload
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
@@ -107,7 +114,19 @@ public class AzureAPI {
                     }
 
                 };
-        detectFaces.execute(inputStream);
+
+        CompletableFuture<Face[]> future = CompletableFuture.supplyAsync(() -> {
+                detectFaces.execute(inputStream);
+                try {
+                    return detectFaces.get();
+                } catch (ExecutionException e) {
+                    e.printStackTrace();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                return null;
+        });
+        return future;
     }
 
 }
