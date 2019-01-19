@@ -49,10 +49,12 @@ public class SimpleIME extends InputMethodService
 
 
     private static Context context;
- 
+    private boolean numbers = false;
+
     @Override
     public void onPress(int primaryCode) {
     }
+
 
     @Override
     public void onRelease(int primaryCode) {
@@ -99,8 +101,29 @@ public class SimpleIME extends InputMethodService
 
         kv = (KeyboardView)getLayoutInflater().inflate(R.layout.keyboard, null);
         keyboard = new Keyboard(this, R.xml.qwerty);
+
+        View view = setView(false);
+        return view;
+    }
+
+    private View setView(boolean iSet) {
+        if( numbers ) {
+            kv = (KeyboardView) getLayoutInflater().inflate(R.layout.keyboard, null);
+            keyboard = new Keyboard(this, R.xml.numbers);
+        }
+        else {
+            kv = (KeyboardView) getLayoutInflater().inflate(R.layout.keyboard, null);
+            keyboard = new Keyboard(this, R.xml.qwerty);
+        }
+
+
         kv.setKeyboard(keyboard);
         kv.setOnKeyboardActionListener(this);
+
+        if (iSet) {
+            setInputView(kv);
+        }
+
         return kv;
     }
 
@@ -116,7 +139,6 @@ public class SimpleIME extends InputMethodService
                 am.playSoundEffect(AudioManager.FX_KEYPRESS_SPACEBAR);
                 break;
             case Keyboard.KEYCODE_DONE:
-            case 10:
                 am.playSoundEffect(AudioManager.FX_KEYPRESS_RETURN);
                 break;
             case Keyboard.KEYCODE_DELETE:
@@ -148,7 +170,6 @@ public class SimpleIME extends InputMethodService
                 Intent intent = new Intent(this, MainActivity.class);
                 intent.putExtra(KEY_RECEIVER, new MessageReceiver());
                 startActivity(intent);
-//                pictureService.startCapturing(this);
                 break;
 
 //                case 97:
@@ -156,7 +177,10 @@ public class SimpleIME extends InputMethodService
 //                    String s = new String(Character.toChars(unicode));
 //                    ic.commitText(s, 1);
 //                break;
-
+            case -6:
+                numbers = !numbers;
+                setView(true);
+                break;
             default:
                 char code = (char) primaryCode;
                 if (Character.isLetter(code) && caps) {
