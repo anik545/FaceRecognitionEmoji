@@ -81,6 +81,12 @@ public class MainActivity extends Activity implements EZCamCallback, View.OnLong
         cam.startPreview();
 
         textureView.setOnLongClickListener(this);
+        try {
+            Thread.sleep(1000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        cam.takePicture();
     }
 
     @Override
