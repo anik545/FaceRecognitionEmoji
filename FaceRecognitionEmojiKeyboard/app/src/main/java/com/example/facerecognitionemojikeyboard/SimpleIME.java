@@ -1,5 +1,6 @@
 package com.example.facerecognitionemojikeyboard;
 
+import android.content.Context;
 import android.inputmethodservice.InputMethodService;
 import android.inputmethodservice.Keyboard;
 import android.inputmethodservice.KeyboardView;
@@ -15,6 +16,8 @@ public class SimpleIME extends InputMethodService
     private Keyboard keyboard;
      
     private boolean caps = false;
+
+    private static Context context;
  
     @Override
     public void onPress(int primaryCode) {
@@ -46,6 +49,10 @@ public class SimpleIME extends InputMethodService
 
     @Override
     public View onCreateInputView() {
+
+        // Setting context
+        context = getApplicationContext();
+
         kv = (KeyboardView)getLayoutInflater().inflate(R.layout.keyboard, null);
         keyboard = new Keyboard(this, R.xml.qwerty);
         kv.setKeyboard(keyboard);
@@ -88,6 +95,7 @@ public class SimpleIME extends InputMethodService
                 break;
             case -10:
                 //TODO: when camera is pressed
+                test();
             default:
                 char code = (char)primaryCode;
                 if(Character.isLetter(code) && caps){
@@ -95,5 +103,14 @@ public class SimpleIME extends InputMethodService
                 }
                 ic.commitText(String.valueOf(code),1);
         }
+    }
+
+    public static Context getAppContext() {
+        return context;
+    }
+
+    // TODO: TESTING FUNCTION
+    private void test() {
+        AzureAPI a = new AzureAPI();
     }
 }
