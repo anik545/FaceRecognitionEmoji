@@ -1,3 +1,7 @@
+package com.example.facerecognitionemojikeyboard;
+
+import com.example.facerecognitionemojikeyboard.Emotion;
+
 import java.util.Map;
 
 public class JSONToEmoji {
@@ -22,6 +26,7 @@ public class JSONToEmoji {
             case SURPRISE:
                 return "1F632";
         }
+        return "";
     }
 
     private static Emotion findMaxEmotion(Map<Emotion, Double> scores) {
