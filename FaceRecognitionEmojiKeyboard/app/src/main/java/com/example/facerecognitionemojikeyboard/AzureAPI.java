@@ -1,9 +1,17 @@
 package com.example.facerecognitionemojikeyboard;
 
 import android.graphics.Bitmap;
+import android.os.AsyncTask;
 import android.util.Log;
 
 import org.json.JSONObject;
+
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.InputStream;
+
+import com.microsoft.projectoxford.face.*;
+import com.microsoft.projectoxford.face.contract.*;
 
 public class AzureAPI {
 
@@ -11,6 +19,7 @@ public class AzureAPI {
             "https://westeurope.api.cognitive.microsoft.com/face/v1.0/detect?returnFaceId=true" +
                     "&returnFaceLandmarks=false&returnFaceAttributes=emotion";
     private String apiKey;
+    private FaceServiceClient faceServiceClient;
 
     AzureAPI() {
 
@@ -21,6 +30,8 @@ public class AzureAPI {
         try {
             apiKeys = new JSONObject(rawApiKeys);
             apiKey = apiKeys.getString("faceApi");
+            faceServiceClient =
+                    new FaceServiceRestClient(apiEndpoint, apiKey);
         } catch (org.json.JSONException e) {
             e.printStackTrace();
         }
@@ -28,8 +39,64 @@ public class AzureAPI {
 //        Log.d("AZUREAPI", "Api Key: " + apiKey);
     }
 
-    public void sendBitmap(Bitmap bitmap) {
-        
+    public void sendBitmap(final Bitmap imageBitmap) {
+
+        // Prepare image for upload
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        imageBitmap.compress(Bitmap.CompressFormat.JPEG, 100, outputStream);
+        ByteArrayInputStream inputStream =
+                new ByteArrayInputStream(outputStream.toByteArray());
+
+        AsyncTask<InputStream, String, Face[]> detectFaces =
+                new AsyncTask<InputStream, String, Face[]>() {
+
+                    String exceptionMessage = "";
+
+                    @Override
+                    protected Face[] doInBackground(InputStream... inputStreams) {
+                        try {
+                            Face[] result = faceServiceClient.detect(
+                                    inputStreams[0],
+                                    true,         // returnFaceId
+                                    false,        // returnFaceLandmarks
+                                    null          // returnFaceAttributes:
+                                /* new FaceServiceClient.FaceAttributeType[] {
+                                    FaceServiceClient.FaceAttributeType.Age,
+                                    FaceServiceClient.FaceAttributeType.Gender }
+                                */
+                            );
+                            return result;
+                        } catch (Exception e) {
+                            exceptionMessage = e.getMessage();
+                            e.printStackTrace();
+                            return null;
+                        }
+                    }
+
+                    @Override
+                    protected void onPreExecute() {
+                        Log.d("AZUREAPI", "Started Detection");
+                    }
+
+                    @Override
+                    protected void onPostExecute(Face[] result) {
+                        if (!exceptionMessage.equals("")) {
+                            Log.d("AZUREAPI", "Error: " + exceptionMessage);
+                            return;
+                        }
+
+                        if (result == null || result.length == 0) {
+                            Log.d("AZUREAPI", "No face found");
+                            return;
+                        }
+
+                        EmotionData faceEmotion = new EmotionData(result[0]);
+                        // TODO: Call function on face emotion
+
+                    }
+
+                };
+        detectFaces.execute(inputStream);
     }
 
 }

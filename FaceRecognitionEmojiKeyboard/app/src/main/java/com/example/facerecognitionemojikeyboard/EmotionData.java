@@ -1,5 +1,7 @@
 package com.example.facerecognitionemojikeyboard;
 
+import com.microsoft.projectoxford.face.contract.Face;
+
 import org.json.JSONObject;
 
 import java.util.HashMap;
@@ -15,8 +17,15 @@ public class EmotionData {
     public double sadness;
     public double surprise;
 
-    EmotionData(JSONObject rawData) {
-        // TODO: Implement
+    EmotionData(Face faceData) {
+        anger = faceData.faceAttributes.emotion.anger;
+        contempt = faceData.faceAttributes.emotion.contempt;
+        disgust = faceData.faceAttributes.emotion.disgust;
+        fear = faceData.faceAttributes.emotion.fear;
+        happiness = faceData.faceAttributes.emotion.happiness;
+        neutral = faceData.faceAttributes.emotion.neutral;
+        sadness = faceData.faceAttributes.emotion.sadness;
+        surprise = faceData.faceAttributes.emotion.surprise;
     }
 
     HashMap<Emotion, Double> exportMap() {
