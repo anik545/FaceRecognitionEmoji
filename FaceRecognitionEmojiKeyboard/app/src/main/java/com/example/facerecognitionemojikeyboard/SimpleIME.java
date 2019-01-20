@@ -72,7 +72,7 @@ public class SimpleIME extends InputMethodService
         ic.commitText(s, 1);
 
     }
- 
+
     private boolean numbers = false;
 
     @Override
@@ -128,19 +128,18 @@ public class SimpleIME extends InputMethodService
             e.printStackTrace();
         }
 
-        kv = (KeyboardView)getLayoutInflater().inflate(R.layout.keyboard, null);
+        kv = (KeyboardView) getLayoutInflater().inflate(R.layout.keyboard, null);
         keyboard = new Keyboard(this, R.xml.qwerty);
 
-        View view = setView(false);
-        return view;
+        setView(false);
+        return kv;
     }
 
     private View setView(boolean iSet) {
-        if( numbers ) {
+        if (numbers) {
             kv = (KeyboardView) getLayoutInflater().inflate(R.layout.keyboard, null);
             keyboard = new Keyboard(this, R.xml.numbers);
-        }
-        else {
+        } else {
             kv = (KeyboardView) getLayoutInflater().inflate(R.layout.keyboard, null);
             keyboard = new Keyboard(this, R.xml.qwerty);
         }
@@ -194,7 +193,7 @@ public class SimpleIME extends InputMethodService
             case Keyboard.KEYCODE_DONE:
                 View view = kv;
                 if (view != null) {
-                    InputMethodManager imm = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
+                    InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
                     imm.hideSoftInputFromWindow(view.getWindowToken(), InputMethodManager.HIDE_IMPLICIT_ONLY);
                 }
 
