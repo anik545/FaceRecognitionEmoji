@@ -55,22 +55,25 @@ public class SimpleIME extends InputMethodService
 
     private static Context context;
 
-    private Set<String> emojis;
+    private String[] emojis;
     private InputConnection ic;
 
     private void updateEmojis(Face[] faces) {
         ic = getCurrentInputConnection();
         EmotionData emotionData = new EmotionData(faces[0]);
-        Log.d("SIMPLEIME", "Calling jsonToEmoji");
-        Set<String> emojis = jsonToEmoji.getEmojis(emotionData.exportMap(), 1);
-        Log.d("SIMPLEIME", "Finished jsonToEmoji");
-        String toCommit = emojis.iterator().next();
-        Log.d("SIMPLEIME", "Committing");
-        Log.d("SIMPLEIME", "Committing: " + toCommit);
-        int i = Integer.valueOf(toCommit, 16);
-        String s = new String(Character.toChars(i));
-        ic.commitText(s, 1);
 
+        Log.d("SIMPLEIME", "Calling jsonToEmoji");
+
+        Set<String> emojis = jsonToEmoji.getEmojis(emotionData.exportMap(), 5);
+        this.emojis = emojis.toArray(new String[emojis.size()]);
+        String toCommit = this.emojis[0];
+
+        Log.d("SIMPLEIME", "Finished jsonToEmoji");
+        Log.d("SIMPLEIME", "Committing: " + toCommit);
+
+        Log.d("SIMPLEIME", "Array length: " + this.emojis.length);
+
+        sendEmoji(toCommit);
     }
 
     private boolean numbers = false;
@@ -141,7 +144,7 @@ public class SimpleIME extends InputMethodService
             keyboard = new Keyboard(this, R.xml.numbers);
         } else {
             kv = (KeyboardView) getLayoutInflater().inflate(R.layout.keyboard, null);
-            keyboard = new Keyboard(this, R.xml.qwerty);
+            keyboard = new Keyboard(this, R.xml.qwerty_with_emojis);
         }
 
 
@@ -159,6 +162,15 @@ public class SimpleIME extends InputMethodService
     public void onDestroy() {
         super.onDestroy();
     }
+
+    private void sendEmoji(String code) {
+        ic = getCurrentInputConnection();
+        int i = Integer.valueOf(code, 16);
+        String s = new String(Character.toChars(i));
+        Log.d("SIMPLEIME", "Sending emoji to keyboard: " + code);
+        ic.commitText(s, 1);
+    }
+
 
     private void playClick(int keyCode) {
         AudioManager am = (AudioManager) getSystemService(AUDIO_SERVICE);
@@ -207,6 +219,33 @@ public class SimpleIME extends InputMethodService
             case -6:
                 numbers = !numbers;
                 setView(true);
+                break;
+
+            // Handling emojis
+            case -100:
+                if (emojis.length > 0) {
+                    sendEmoji(emojis[0]);
+                }
+                break;
+            case -101:
+                if (emojis.length > 1) {
+                    sendEmoji(emojis[1]);
+                }
+                break;
+            case -102:
+                if (emojis.length > 2) {
+                    sendEmoji(emojis[2]);
+                }
+                break;
+            case -103:
+                if (emojis.length > 3) {
+                    sendEmoji(emojis[3]);
+                }
+                break;
+            case -104:
+                if (emojis.length > 4) {
+                    sendEmoji(emojis[4]);
+                }
                 break;
             default:
                 char code = (char) primaryCode;
