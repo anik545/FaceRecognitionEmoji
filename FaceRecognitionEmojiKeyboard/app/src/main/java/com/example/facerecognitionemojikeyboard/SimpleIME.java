@@ -77,15 +77,13 @@ public class SimpleIME extends InputMethodService
 
         Log.d("SIMPLEIME", "Array length: " + this.emojis.length);
 
-        //sendEmoji(toCommit);
-
+        sendEmoji(toCommit);
 
         for (int j = 0; j < 5; j++) {
             Keyboard.Key key = findKey(keyboard, -100 - j);
             int i2 = Integer.valueOf(this.emojis[j], 16);
             key.label = new String(Character.toChars(i2));
         }
-
     }
 
     private Keyboard.Key findKey(Keyboard keyboard, int primaryCode) {
