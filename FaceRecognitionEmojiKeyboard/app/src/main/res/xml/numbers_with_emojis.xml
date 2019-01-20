@@ -7,6 +7,13 @@
     >
 
     <Row>
+        <Key android:codes="-100" android:keyLabel="&#x1f595;" android:keyWidth="20%p"  android:keyEdgeFlags="left"/>
+        <Key android:codes="-101" android:keyLabel="&#x1f624;" android:keyWidth="20%p" />
+        <Key android:codes="-102" android:keyLabel="&#x1f621;" android:keyWidth="20%p" />
+        <Key android:codes="-103" android:keyLabel="&#x1f92c;" android:keyWidth="20%p" />
+        <Key android:codes="-104" android:keyLabel="&#x1f47f;" android:keyWidth="20%p" />
+    </Row>
+    <Row>
         <Key android:codes="48" android:keyLabel="0" android:keyEdgeFlags="left"/>
         <Key android:codes="49" android:keyLabel="1"/>
         <Key android:codes="50" android:keyLabel="2"/>
