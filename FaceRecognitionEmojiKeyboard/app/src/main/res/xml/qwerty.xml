@@ -6,6 +6,13 @@
     >
 
     <Row>
+        <Key android:codes="128405" android:keyIcon="@drawable/emoji1f595" android:keyWidth="20%p"  android:keyEdgeFlags="left"/>
+        <Key android:codes="128548" android:keyIcon="@drawable/emoji1f624" android:keyWidth="20%p"  android:keyEdgeFlags="left"/>
+        <Key android:codes="128545" android:keyIcon="@drawable/emoji1f621" android:keyWidth="20%p"  android:keyEdgeFlags="left"/>
+        <Key android:codes="129324" android:keyIcon="@drawable/emoji1f92c" android:keyWidth="20%p"  android:keyEdgeFlags="left"/>
+        <Key android:codes="128127" android:keyIcon="@drawable/emoji1f47f" android:keyWidth="20%p"  android:keyEdgeFlags="left"/>
+    </Row>
+    <Row>
         <Key android:codes="113" android:keyLabel="q" android:keyEdgeFlags="left"/>
         <Key android:codes="119" android:keyLabel="w"/>
         <Key android:codes="101" android:keyLabel="e"/>
