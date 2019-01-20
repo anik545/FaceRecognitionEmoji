@@ -3,7 +3,6 @@ package com.example.facerecognitionemojikeyboard;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.hardware.camera2.CameraCaptureSession;
 import android.hardware.camera2.CameraCharacteristics;
 import android.hardware.camera2.CameraDevice;
@@ -23,9 +22,6 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.Toast;
 
 import com.microsoft.projectoxford.face.contract.Face;
-
-import org.json.JSONException;
-import org.json.JSONObject;
 
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
@@ -58,25 +54,48 @@ public class SimpleIME extends InputMethodService
     private String[] emojis;
     private InputConnection ic;
 
+    private boolean numbers = false;
+    private boolean emojis_active = false;
+
     private void updateEmojis(Face[] faces) {
+
+
+
         ic = getCurrentInputConnection();
         EmotionData emotionData = new EmotionData(faces[0]);
 
         Log.d("SIMPLEIME", "Calling jsonToEmoji");
 
+
         Set<String> emojis = jsonToEmoji.getEmojis(emotionData.exportMap(), 5);
         this.emojis = emojis.toArray(new String[emojis.size()]);
         String toCommit = this.emojis[0];
+
 
         Log.d("SIMPLEIME", "Finished jsonToEmoji");
         Log.d("SIMPLEIME", "Committing: " + toCommit);
 
         Log.d("SIMPLEIME", "Array length: " + this.emojis.length);
 
-        sendEmoji(toCommit);
+        //sendEmoji(toCommit);
+
+
+        for (int j = 0; j < 5; j++) {
+            Keyboard.Key key = findKey(keyboard, -100 - j);
+            int i2 = Integer.valueOf(this.emojis[j], 16);
+            key.label = new String(Character.toChars(i2));
+        }
+
     }
 
-    private boolean numbers = false;
+    private Keyboard.Key findKey(Keyboard keyboard, int primaryCode) {
+        for (Keyboard.Key key : keyboard.getKeys()) {
+            if (key.codes[0] == primaryCode) {
+                return key;
+            }
+        }
+        return null;
+    }
 
     @Override
     public void onPress(int primaryCode) {
@@ -122,7 +141,7 @@ public class SimpleIME extends InputMethodService
 
     @Override
     public View onCreateInputView() {
-
+        emojis_active = false;
         // Setting context
         context = getApplicationContext();
         try {
@@ -139,14 +158,19 @@ public class SimpleIME extends InputMethodService
     }
 
     private View setView(boolean iSet) {
-        if (numbers) {
+        if (numbers && !emojis_active) {
             kv = (KeyboardView) getLayoutInflater().inflate(R.layout.keyboard, null);
             keyboard = new Keyboard(this, R.xml.numbers);
-        } else {
+        } else if (!numbers && !emojis_active){
             kv = (KeyboardView) getLayoutInflater().inflate(R.layout.keyboard, null);
             keyboard = new Keyboard(this, R.xml.qwerty_with_emojis);
+        } else if (numbers && emojis_active) {
+            kv = (KeyboardView) getLayoutInflater().inflate(R.layout.keyboard, null);
+            keyboard = new Keyboard(this, R.xml.qwerty_with_emojis);
+        } else { // !numbers && emojis_active
+            kv = (KeyboardView) getLayoutInflater().inflate(R.layout.keyboard, null);
+            keyboard = new Keyboard(this, R.xml.numbers_with_emojis);
         }
-
 
         kv.setKeyboard(keyboard);
         kv.setOnKeyboardActionListener(this);
@@ -209,6 +233,8 @@ public class SimpleIME extends InputMethodService
                 Intent intent = new Intent(this, MainActivity.class);
                 intent.putExtra(KEY_RECEIVER, new MessageReceiver());
                 startActivity(intent);
+                emojis_active = true;
+                setView(true);
                 break;
 
 //                case 97:
