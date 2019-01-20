@@ -83,6 +83,12 @@ public class SimpleIME extends InputMethodService
 
         sendEmoji(toCommit);
         updateEmojis();
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                setView(true);
+            }
+        });
     }
 
     private void updateEmojis() {
