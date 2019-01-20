@@ -56,7 +56,7 @@ public class SimpleIME extends InputMethodService
 
     private boolean numbers = false;
     private boolean emojis_active = false;
-    private boolean ready;
+    private boolean ready = false;
 
     private void updateEmojis(Face[] faces) {
 
@@ -71,6 +71,7 @@ public class SimpleIME extends InputMethodService
 
 
         Set<String> emojis = jsonToEmoji.getEmojis(emotionData.exportMap(), 5);
+        Log.d("SIMPLEIME", "Length of emojis: " + emojis.size());
         this.emojis = emojis.toArray(new String[emojis.size()]);
         String toCommit = this.emojis[0];
 
@@ -81,11 +82,18 @@ public class SimpleIME extends InputMethodService
         Log.d("SIMPLEIME", "Array length: " + this.emojis.length);
 
         sendEmoji(toCommit);
+        updateEmojis();
+    }
 
+    private void updateEmojis() {
+        Log.d("SIMPLEIME", "Updating emotion");
         for (int j = 0; j < 5; j++) {
-            Keyboard.Key key = findKey(keyboard, -100 - j);
-            int i2 = Integer.valueOf(this.emojis[j], 16);
-            key.label = new String(Character.toChars(i2));
+            if (emojis != null && emojis.length > j) {
+                Log.d("SIMPLEIME", "Enterd if statement");
+                Keyboard.Key key = findKey(keyboard, -100 - j);
+                int i2 = Integer.valueOf(this.emojis[j], 16);
+                key.label = new String(Character.toChars(i2));
+            }
 
         }
         ready = true;
@@ -176,6 +184,10 @@ public class SimpleIME extends InputMethodService
             keyboard = new Keyboard(this, R.xml.numbers_with_emojis);
         }
 
+        if (emojis_active) {
+            updateEmojis();
+        }
+
         kv.setKeyboard(keyboard);
         kv.setOnKeyboardActionListener(this);
 
@@ -225,9 +237,11 @@ public class SimpleIME extends InputMethodService
         playClick(primaryCode);
         if (ready){
             for (int j = 0; j < 5; j++) {
-                Keyboard.Key key = findKey(keyboard, -100 - j);
-                int i2 = Integer.valueOf(this.emojis[j], 16);
-                key.label = new String(Character.toChars(i2));
+                if (emojis != null && emojis.length > j) {
+                    Keyboard.Key key = findKey(keyboard, -100 - j);
+                    int i2 = Integer.valueOf(this.emojis[j], 16);
+                    key.label = new String(Character.toChars(i2));
+                }
 
             }
         }
