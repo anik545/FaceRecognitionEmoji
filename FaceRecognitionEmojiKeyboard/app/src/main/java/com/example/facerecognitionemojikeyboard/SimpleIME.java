@@ -192,6 +192,12 @@ public class SimpleIME extends InputMethodService
                 kv.invalidateAllKeys();
                 break;
             case Keyboard.KEYCODE_DONE:
+                View view = kv;
+                if (view != null) {
+                    InputMethodManager imm = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
+                    imm.hideSoftInputFromWindow(view.getWindowToken(), InputMethodManager.HIDE_IMPLICIT_ONLY);
+                }
+
                 ic.sendKeyEvent(new KeyEvent(KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_ENTER));
                 break;
             case -10:
